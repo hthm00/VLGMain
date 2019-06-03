@@ -10,6 +10,8 @@
 // @connect      vietlinkglobal.com
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @require      https://unpkg.com/jspdf@latest/dist/jspdf.min.js
+// @updateURL    https://github.com/hthm00/VLGMain/raw/master/%5BVLG%5D%20Master%20Airway%20Bill%20-%20Sort%20Remote%20Customer.user.js
+// @downloadURL  https://github.com/hthm00/VLGMain/raw/master/%5BVLG%5D%20Master%20Airway%20Bill%20-%20Sort%20Remote%20Customer.user.js
 // ==/UserScript==
 
 (function() {
