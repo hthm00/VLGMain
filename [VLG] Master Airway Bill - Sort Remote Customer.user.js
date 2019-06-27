@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [VLG] Master Airway Bill - Sort Remote Customer
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      1.3
 // @description  Sort remote customer
 // @author       Minh Huynh
 // @match        https://vietlinkglobal.com/admin/master-shipment/*/show
