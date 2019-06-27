@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         [VLG] Master Airway Bill - Sort Remote Customer
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Sort remote customer
 // @author       Minh Huynh
 // @match        https://vietlinkglobal.com/admin/master-shipment/*/show
@@ -10,14 +10,15 @@
 // @connect      vietlinkglobal.com
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js
 // @require      https://unpkg.com/jspdf@latest/dist/jspdf.min.js
-// @updateURL    https://github.com/hthm00/VLGMain/raw/master/%5BVLG%5D%20Master%20Airway%20Bill%20-%20Sort%20Remote%20Customer.user.js
+// @updateURL    https://github.com/hthm00/VLGMain/raw/master/%5BVLG%5D%20Master%20Airway%20Bill%20-%20Sort%20Remote%20Customer.meta.js
 // @downloadURL  https://github.com/hthm00/VLGMain/raw/master/%5BVLG%5D%20Master%20Airway%20Bill%20-%20Sort%20Remote%20Customer.user.js
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    var shipmentsData = new Map();
+    var remoteCustomersData = new Map();
+    var agentData = new Map();
     var count = 1000;
     const exportListId = $('.master-shipment.detail-master-shipment:eq(0)').attr('data-export_list_id');
     var searchRequestCount = 0, invoiceRequestCount = 0;
@@ -27,22 +28,25 @@
     const copyRemoteCusEmailsDiv = $(`<a id="copy-remote-customer-emails" class="btn btn-default disabled">
         Getting Remote Customers Data...
       </a>`);
-    function mapToObj(inputMap) {
-        let obj = {'MAWBNum': '', 'remoteCustomersData': {}};
+    function mapToObj() {
+        let obj = {'MAWBNum': '', 'remoteCustomersData': {}, 'agentData' : {}};
         console.log(obj);
         obj['MAWBNum'] = MAWBNum;
         //obj["remoteCustomerData"] = {};
 
-        inputMap.forEach(function(value, key){
+        remoteCustomersData.forEach(function(value, key){
             obj['remoteCustomersData'][key] = value
+        });
+        agentData.forEach(function(value, key){
+            obj['agentData'][key] = value
         });
 
         return obj;
     }
     $('.row.x_title:eq(0)').append(copyRemoteCusEmailsDiv);
     $('.row.x_title:eq(0)').on('click', () => {
-        //console.log(mapToObj(shipmentsData));
-        GM_setClipboard(JSON.stringify(mapToObj(shipmentsData)));
+        //console.log(mapToObj(remoteCustomersData));
+        GM_setClipboard(JSON.stringify(mapToObj()));
     })
 
     var masterAirwayBillApi = `https://vietlinkglobal.com/admin/master-shipment/detail-full?_=1558683029777&columns%5B0%5D%5Bdata%5D=0&columns%5B0%5D%5Bname%5D=&columns%5B0%5D%5Borderable%5D=true&columns%5B0%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B0%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B0%5D%5Bsearchable%5D=true&columns%5B1%5D%5Bdata%5D=1&columns%5B1%5D%5Bname%5D=&columns%5B1%5D%5Borderable%5D=true&columns%5B1%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B1%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B1%5D%5Bsearchable%5D=true&columns%5B2%5D%5Bdata%5D=2&columns%5B2%5D%5Bname%5D=&columns%5B2%5D%5Borderable%5D=true&columns%5B2%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B2%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B2%5D%5Bsearchable%5D=true&columns%5B3%5D%5Bdata%5D=3&columns%5B3%5D%5Bname%5D=&columns%5B3%5D%5Borderable%5D=true&columns%5B3%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B3%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B3%5D%5Bsearchable%5D=true&columns%5B4%5D%5Bdata%5D=4&columns%5B4%5D%5Bname%5D=&columns%5B4%5D%5Borderable%5D=true&columns%5B4%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B4%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B4%5D%5Bsearchable%5D=true&columns%5B5%5D%5Bdata%5D=5&columns%5B5%5D%5Bname%5D=&columns%5B5%5D%5Borderable%5D=true&columns%5B5%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B5%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B5%5D%5Bsearchable%5D=true&columns%5B6%5D%5Bdata%5D=6&columns%5B6%5D%5Bname%5D=&columns%5B6%5D%5Borderable%5D=true&columns%5B6%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B6%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B6%5D%5Bsearchable%5D=true&columns%5B7%5D%5Bdata%5D=7&columns%5B7%5D%5Bname%5D=&columns%5B7%5D%5Borderable%5D=true&columns%5B7%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B7%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B7%5D%5Bsearchable%5D=true&columns%5B8%5D%5Bdata%5D=8&columns%5B8%5D%5Bname%5D=&columns%5B8%5D%5Borderable%5D=true&columns%5B8%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B8%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B8%5D%5Bsearchable%5D=true&draw=1&exportListId=${exportListId}&length=1000&search%5Bregex%5D=false&search%5Bvalue%5D=&start=0`
@@ -70,7 +74,7 @@
                 const customerCode = invoice.substring(0,5);
                 const checkerCode = customerCode.substring(1,5);
                 if (!isNaN(checkerCode)) {
-                    shipmentsData.set(invoice, {email: '', invoiceTitle: invoice.trim(), invoiceFile: ''})
+                    remoteCustomersData.set(invoice, {email: '', invoiceTitle: invoice.trim(), invoiceFile: ''})
                     // Request invoice
                     const invoiceApi = `https://vietlinkglobal.com${invoiceLink}`
                     GM_xmlhttpRequest ( {
@@ -84,6 +88,11 @@
                     } );
 
                     remoteCustomerCodes.push(customerCode);
+                } else {
+                    const isVLGA = invoice.substring(0,4) == "VLGA";
+                    if (!isVLGA) {
+                        agentData.set(invoice, {email: '', invoiceTitle: invoice.trim(), invoiceFile: ''})
+                    }
                 }
             });
             console.log(remoteCustomerCodes);
@@ -112,7 +121,7 @@
             return;
         }
         var pyLd = rspObj.response;
-        if (pyLd.length > 0) {
+        if (pyLd.length > 0) {/*
             const recipientElement = $($(pyLd)[33]).html();
             const deliveryType = recipientElement.match('(Delivery option: )(.*?)(<br>)')[2];
             const serviceType = recipientElement.match('(Service type: <span style="font-weight: bold;font-size: 16px;">)(.*?)(</span>)')[2];
@@ -139,16 +148,17 @@
 
 //console.log(recipientElement);
             console.log(date);
-            console.log(otherChargeElement);
+            console.log(otherChargeElement);*/
             //console.log(packagesInNotes)
 
             //const invoiceDiv = pyLd.match("<body>(.*?)<\/body>")[0];
+           //const invoiceDiv = ""
             const invoiceDiv = pyLd;
             const invoiceTitle = pyLd.match('<span style="font-weight: bold;font-size: 16px;">(.*?)</span>')[1]
             const code = invoiceTitle.substring(0, 5);
             const type = pyLd.includes('Bill to sender') ? 'sender' : 'recipient';
-            shipmentsData.get(invoiceTitle)['invoiceFile'] = invoiceDiv.trim();
-            shipmentsData.get(invoiceTitle)['type'] = type.trim();
+            remoteCustomersData.get(invoiceTitle)['invoiceFile'] = invoiceDiv.trim();
+            remoteCustomersData.get(invoiceTitle)['type'] = type.trim();
             return pyLd;
         }
 
@@ -167,18 +177,18 @@
             const code = item[0];
             const email = item[2];
 
-            let keys =[ ...shipmentsData.keys() ];
+            let keys =[ ...remoteCustomersData.keys() ];
             keys.forEach((key) => {
                 if (key.includes(code)) {
-                    shipmentsData.get(key)['email'] = email.trim();
+                    remoteCustomersData.get(key)['email'] = email.trim();
                 }
             })
             if (searchRequestCount === count) {
-                console.log(shipmentsData);
+                console.log(remoteCustomersData);
                 $('#copy-remote-customer-emails').removeClass('disabled');
                 $('#copy-remote-customer-emails').html('Copy Remote Customers Data');
             }
-            return shipmentsData;
+            return remoteCustomersData;
         }
 
         return '';
